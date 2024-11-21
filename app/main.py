@@ -5,15 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes import utils
 from app.routes.graphql import graphql_app
-from app.core.db import get_session, engine, create_db_and_tables
+from app.core.db import get_session, engine, create_db_and_tables, drop_db_and_tables
 from app.core.config import settings
 
 api_router = APIRouter()
-api_router.include_router(utils.router, prefix="/utils", tags=["utils"])
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await create_db_and_tables()
     yield
     if engine is not None:
         await get_session().close()
@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -32,15 +33,11 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-async def startup():
-    await create_db_and_tables()
-
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 
-app.include_router(graphql_app, prefix="/graphql", tags=["utils"])
 app.include_router(api_router, prefix="/api", tags=["api"])
+app.include_router(utils.router, prefix="/utils", tags=["utils"])
+app.include_router(graphql_app, prefix="/graphql", tags=["graphql"])

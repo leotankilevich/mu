@@ -30,11 +30,6 @@ target_metadata = SQLModel.metadata
 
 
 def get_url():
-
-    print(
-        str(settings.SQLALCHEMY_ALEMBIC_DATABASE_URI),
-        "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
-    )
     return str(settings.SQLALCHEMY_ALEMBIC_DATABASE_URI)
 
 
