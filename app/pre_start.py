@@ -5,7 +5,7 @@ from sqlmodel import Session, select
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncEngine
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
-from app.core.db import db_session
+from app.core.db import engine
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ async def init(db_engine: AsyncEngine) -> None:
 
 def main() -> None:
     logger.info("Initializing service")
-    init(db_session.engine)
+    init(engine)
     logger.info("Service finished initializing")
 
 

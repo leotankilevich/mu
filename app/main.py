@@ -1,11 +1,10 @@
-import logging
-import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, APIRouter
 
 from app.routes import utils
-from app.core.db import db_session
+from app.routes.graphql import graphql_app
+from app.core.db import get_session, engine
 from app.core.config import settings
 
 api_router = APIRouter()
@@ -15,11 +14,13 @@ api_router.include_router(utils.router, prefix="/utils", tags=["utils"])
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
-    if db_session.engine is not None:
-        await db_session.close()
+    if engine is not None:
+        await get_session().close()
 
 
-app = FastAPI(title=settings.PROJECT_NAME, lifespan=lifespan)
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+)
 
 
 @app.get("/")
@@ -27,4 +28,5 @@ async def root():
     return {"message": "Hello World"}
 
 
+app.include_router(graphql_app, prefix="/graphql", tags=["utils"])
 app.include_router(api_router, prefix="/api", tags=["api"])
