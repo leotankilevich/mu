@@ -5,11 +5,10 @@ from sqlmodel import select, update, delete
 
 class NoteRepository:
     @staticmethod
-    async def create(note: Note):
+    async def create(note_data: Note):
         async with get_session() as session:
-            async with session.begin():
-                session.add(note)
-            await get_session().commit()
+            session.add(note_data)
+            await session.commit()
 
     @staticmethod
     async def get_by_id(note_id: int) -> Note:

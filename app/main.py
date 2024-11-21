@@ -4,7 +4,7 @@ from fastapi import FastAPI, APIRouter
 
 from app.routes import utils
 from app.routes.graphql import graphql_app
-from app.core.db import get_session, engine
+from app.core.db import get_session, engine, create_db_and_tables
 from app.core.config import settings
 
 api_router = APIRouter()
@@ -21,6 +21,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
 )
+
+
+@app.on_event("startup")
+async def startup():
+    await create_db_and_tables()
 
 
 @app.get("/")
